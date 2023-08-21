@@ -1,24 +1,26 @@
 @extends('admin.admin_dashboard')
 @section('admin')
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
     <div class="page-content">
         <div class="row">
             <div class="col-12 grid-margin">
                 <div class="card">
                     <div class="position-relative">
-                        <div class="div" style="background-image:url(https://cdn.pixabay.com/photo/2019/01/05/19/02/rain-3915684_1280.jpg); width:100%; height:370px; background-repeat:no-repeat;background-size:cover">
+                        <div class="div"
+                            style="background-image:url(https://cdn.pixabay.com/photo/2019/01/05/19/02/rain-3915684_1280.jpg); width:100%; height:370px; background-repeat:no-repeat;background-size:cover">
 
                         </div>
 
                         <div
                             class="d-flex justify-content-between align-items-center position-absolute top-90 w-100 px-2 px-md-4 mt-n4">
                             <div>
-                                <img class="wd-70 rounded-circle" src="{{ (!empty($profileData->photo))?url('upload/admin_admin_images/'.$profileData->photo) : url('upload/no_image.jpg') }}" alt="profile">
+                                <img class="rounded-circle wd-100 "
+                                    src="{{ !empty($profileData->photo) ? url('upload/admin_images/' . $profileData->photo) : url('upload/no_image.jpg') }}"
+                                    alt="profile">
                                 <span class="h4 ms-3 text-dark">{{ $profileData->username }}</span>
                             </div>
                             <div class="d-none d-md-block">
-                                <button class="btn btn-primary btn-icon-text">
-                                    <i data-feather="edit" class="btn-icon-prepend"></i>Edit profile
-                                </button>
+
                             </div>
                         </div>
                     </div>
@@ -30,10 +32,7 @@
                                 <a class="pt-1px d-none d-md-block text-body" href="#">About</a>
                             </li>
 
-                            <li class="ms-3 ps-3 border-start d-flex align-items-center">
-                                <i class="me-1 icon-md" data-feather="image"></i>
-                                <a class="pt-1px d-none d-md-block text-body" href="#">Photos</a>
-                            </li>
+
 
                         </ul>
                     </div>
@@ -89,11 +88,12 @@
                             <div class="card-header">
                                 <div class="d-flex align-items-center justify-content-between">
                                     <div class="d-flex align-items-center">
-                                        <img class="img-xs rounded-circle" src="https://via.placeholder.com/37x37"
+                                        <img class="img-xs rounded-circle"
+                                            src="{{ !empty($profileData->photo) ? url('upload/admin_images/' . $profileData->photo) : url('upload/no_image.jpg') }}"
                                             alt="">
                                         <div class="ms-2">
 
-                                            <p>Basic Form</p>
+                                            <p>Update Admin Profile</p>
 
                                         </div>
                                     </div>
@@ -104,30 +104,41 @@
                             <div class="card-body">
 
 
-                                <form class="forms-sample">
+                                <form class="forms-sample" method="POST" action="{{ route('admin.profile.store') }}" enctype="multipart/form-data">
+                                    @csrf
+                                    <div class="mb-3">
+                                        <label for="exampleInputUsername1" class="form-label">User Name :</label>
+                                        <input type="text" class="form-control" id="username" name="username"
+                                            autocomplete="off" value="{{ $profileData->username }}">
+                                    </div>
                                     <div class="mb-3">
                                         <label for="exampleInputUsername1" class="form-label">Name :</label>
-                                        <input type="text" class="form-control" id="exampleInputUsername1"
-                                            autocomplete="off" placeholder="Username">
+                                        <input type="text" class="form-control" id="name" name="name"
+                                            autocomplete="off" value="{{ $profileData->name }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="exampleInputEmail1" class="form-label">Email address :</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1"
-                                            placeholder="Email">
+                                        <input type="email" class="form-control" id="emial" name="email"
+                                            value="{{ $profileData->email }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="exampleInputEmail1" class="form-label">Phone :</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1"
-                                            placeholder="Email">
+                                        <input type="text" class="form-control" id="phone" name="phone"
+                                            value="{{ $profileData->phone }}">
                                     </div>
                                     <div class="mb-3">
                                         <label for="exampleInputEmail1" class="form-label">Address :</label>
-                                        <input type="email" class="form-control" id="exampleInputEmail1"
-                                            placeholder="Email">
+                                        <input type="text" class="form-control" id="address" name="address"
+                                            value="{{ $profileData->address }}">
+                                    </div>
+                                    <div class="mb-3">
+                                        <label for="exampleInputEmail1" class="form-label">Photo :</label>
+                                        <input class="form-control" type="file" id="photo" name="photo">
+                                        <img class="wd-70 rounded-circle mt-3" id="showImage" name="showImage"
+                                            src="{{ !empty($profileData->photo) ? url('upload/admin_images/' . $profileData->photo) : url('upload/no_image.jpg') }}"
+                                            alt="profile">
                                     </div>
 
-
-                                </form>
 
                             </div>
                             <div class="card-footer">
@@ -135,10 +146,11 @@
 
                                     <a href="javascript:;" class="d-flex align-items-center text-muted">
                                         <button type="submit" class="btn btn-primary me-2">Submit</button>
-                                    <button class="btn btn-secondary">Cancel</button>
+                                        <button class="btn btn-secondary">Cancel</button>
                                     </a>
                                 </div>
                             </div>
+                        </form>
                         </div>
                     </div>
 
@@ -148,4 +160,16 @@
         </div>
 
     </div>
+
+    <script>
+        $(document).ready(function(){
+            $('#photo').change(function(e){
+                var reader = new FileReader();
+                reader.onload = function(e){
+                    $('#showImage').attr('src',e.target.result);
+                }
+                reader.readAsDataURL(e.target.files['0']);
+            });
+        });
+    </script>
 @endsection
